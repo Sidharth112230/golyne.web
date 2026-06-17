@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Golyne — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --void:#05030e;--surface:#100e26;--card:#13112b;--card2:#181433;
+  --violet:#7c3aed;--vb:#a855f7;--cyan:#06b6d4;--cb:#22d3ee;
+  --pink:#ec4899;--red:#f87171;--green:#34d399;
+  --white:#f5f3ff;--muted:#8b7daa;
+  --border:rgba(139,92,246,0.18);
+}
+html,body{background:var(--void);color:var(--white);font-family:'Space Grotesk',sans-serif;min-height:100vh;}
+::-webkit-scrollbar{width:8px;}
+::-webkit-scrollbar-thumb{background:rgba(139,92,246,0.4);border-radius:4px;}
+input,textarea,select,button{font-family:inherit;}
+a{color:inherit;}
+
+/* LOGIN */
+.login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:5%;}
+.login-box{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:2.6rem 2.4rem;max-width:380px;width:100%;box-shadow:0 30px 70px rgba(0,0,0,0.5);}
+.login-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;background:linear-gradient(135deg,#a855f7,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.3rem;}
+.login-sub{color:var(--muted);font-size:.82rem;margin-bottom:1.8rem;}
+.field{margin-bottom:1.2rem;}
+.field label{display:block;font-size:.74rem;color:var(--muted);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:1px;}
+.field input,.field textarea,.field select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:11px 13px;color:var(--white);font-size:.88rem;outline:none;transition:border-color .2s;}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--vb);}
+.field textarea{resize:vertical;min-height:70px;line-height:1.5;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;border-radius:9px;padding:12px 22px;font-weight:600;font-size:.86rem;cursor:pointer;transition:all .2s;}
+.btn-primary{background:linear-gradient(135deg,#7c3aed,#06b6d4);color:#fff;box-shadow:0 4px 18px rgba(124,58,237,0.35);}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 26px rgba(124,58,237,0.5);}
+.btn-ghost{background:rgba(255,255,255,0.04);color:var(--white);border:1px solid var(--border);}
+.btn-ghost:hover{background:rgba(124,58,237,0.1);}
+.btn-danger{background:rgba(248,113,113,0.12);color:var(--red);border:1px solid rgba(248,113,113,0.3);}
+.btn-danger:hover{background:rgba(248,113,113,0.2);}
+.btn-block{width:100%;}
+.btn-sm{padding:7px 13px;font-size:.76rem;border-radius:7px;}
+.error-msg{background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);color:var(--red);padding:10px 13px;border-radius:8px;font-size:.8rem;margin-bottom:1rem;display:none;}
+.success-msg{background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.3);color:var(--green);padding:10px 13px;border-radius:8px;font-size:.8rem;margin-bottom:1rem;display:none;}
+
+/* DASHBOARD SHELL */
+.app{display:none;min-height:100vh;}
+.topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:16px 5%;background:rgba(5,3,14,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.topbar-left{display:flex;align-items:center;gap:14px;}
+.topbar-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;background:linear-gradient(135deg,#a855f7,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.topbar-tag{font-size:.7rem;color:var(--muted);border:1px solid var(--border);padding:3px 9px;border-radius:6px;}
+.topbar-right{display:flex;gap:10px;align-items:center;}
+
+.main{padding:36px 5% 80px;max-width:1200px;margin:0 auto;}
+.main-head{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem;margin-bottom:2rem;}
+.main-head h1{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;}
+.main-head p{color:var(--muted);font-size:.84rem;margin-top:.3rem;}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
+.svc-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.4rem;display:flex;flex-direction:column;gap:.7rem;transition:border-color .2s,transform .2s;}
+.svc-card:hover{border-color:rgba(139,92,246,0.4);transform:translateY(-3px);}
+.svc-card-top{display:flex;align-items:center;gap:10px;}
+.svc-emoji{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+.svc-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.96rem;}
+.svc-id{font-size:.68rem;color:var(--muted);font-family:monospace;}
+.svc-tagline{font-size:.78rem;color:var(--muted);line-height:1.55;flex:1;}
+.svc-meta{display:flex;gap:8px;font-size:.7rem;color:var(--muted);}
+.svc-actions{display:flex;gap:8px;margin-top:.4rem;}
+.svc-actions .btn{flex:1;}
+
+.empty-state{text-align:center;padding:4rem 1rem;color:var(--muted);}
+
+/* MODAL / FORM PANEL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(2,1,8,0.7);backdrop-filter:blur(4px);z-index:100;overflow-y:auto;padding:3% 0;}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:18px;max-width:760px;margin:0 auto;padding:2.2rem 2.2rem 2.6rem;box-shadow:0 40px 90px rgba(0,0,0,0.6);}
+.panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.6rem;}
+.panel-head h2{font-family:'Syne',sans-serif;font-size:1.25rem;font-weight:800;}
+.close-x{background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;line-height:1;padding:4px;}
+.close-x:hover{color:var(--white);}
+
+.section-block{margin-bottom:1.8rem;padding-top:1.4rem;border-top:1px solid var(--border);}
+.section-block:first-of-type{border-top:none;padding-top:0;}
+.section-block h3{font-size:.78rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--cb);margin-bottom:1rem;font-weight:600;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;}
+.color-row{display:flex;gap:10px;align-items:center;}
+.color-row input[type=color]{width:46px;height:42px;padding:2px;border-radius:8px;border:1px solid var(--border);background:var(--surface);cursor:pointer;}
+.hint{font-size:.72rem;color:var(--muted);margin-top:.3rem;}
+
+.rep-row{display:flex;gap:8px;margin-bottom:8px;align-items:flex-start;}
+.rep-row input,.rep-row textarea{flex:1;}
+.rep-row .rep-icon{flex:0 0 56px;text-align:center;}
+.rep-remove{flex:0 0 auto;background:rgba(248,113,113,0.12);color:var(--red);border:1px solid rgba(248,113,113,0.25);border-radius:7px;width:34px;height:34px;cursor:pointer;font-size:.9rem;margin-top:1px;}
+.rep-remove:hover{background:rgba(248,113,113,0.22);}
+.rep-add{margin-top:4px;}
+
+.panel-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:1.6rem;padding-top:1.4rem;border-top:1px solid var(--border);}
+
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+@media(max-width:700px){.row2,.row3{grid-template-columns:1fr;}.panel{padding:1.6rem 1.3rem 2rem;border-radius:14px;}}
+</style>
+</head>
+<body>
+
+<!-- ══════════ LOGIN ══════════ -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">golyne admin</div>
+    <div class="login-sub">Sign in to manage your services</div>
+    <div class="error-msg" id="loginError"></div>
+    <form id="loginForm">
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="loginPassword" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block" id="loginBtn">Log In</button>
+    </form>
+  </div>
+</div>
+
+<!-- ══════════ DASHBOARD ══════════ -->
+<div class="app" id="app">
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-logo">golyne admin</span>
+      <span class="topbar-tag">Service Manager</span>
+    </div>
+    <div class="topbar-right">
+      <a href="../index.html" target="_blank" class="btn btn-ghost btn-sm">View Site ↗</a>
+      <button class="btn btn-ghost btn-sm" id="logoutBtn">Log Out</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="main-head">
+      <div>
+        <h1>Services</h1>
+        <p>Add, edit, or remove the services shown on your homepage and service pages.</p>
+      </div>
+      <button class="btn btn-primary" id="addServiceBtn">+ Add Service</button>
+    </div>
+    <div class="success-msg" id="dashSuccess"></div>
+    <div class="error-msg" id="dashError"></div>
+    <div class="grid" id="servicesGrid"></div>
+  </div>
+</div>
+
+<!-- ══════════ ADD/EDIT FORM OVERLAY ══════════ -->
+<div class="overlay" id="formOverlay">
+  <div class="panel">
+    <div class="panel-head">
+      <h2 id="formTitle">Add Service</h2>
+      <button class="close-x" id="closeFormBtn">✕</button>
+    </div>
+    <div class="error-msg" id="formError"></div>
+    <form id="serviceForm">
+      <input type="hidden" id="f_isEdit" value="0">
+
+      <div class="section-block">
+        <h3>Basics</h3>
+        <div class="row2">
+          <div class="field">
+            <label>Service Name</label>
+            <input type="text" id="f_name" placeholder="e.g. Website Development" required>
+          </div>
+          <div class="field">
+            <label>Page ID (in the URL)</label>
+            <input type="text" id="f_id" placeholder="auto-generated from name">
+            <div class="hint">Used as service.html?service=ID. Letters, numbers, hyphens only.</div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Tagline (shown on homepage card)</label>
+          <textarea id="f_tagline" placeholder="One short sentence describing this service" rows="2"></textarea>
+        </div>
+        <div class="row3">
+          <div class="field">
+            <label>Icon (emoji)</label>
+            <input type="text" id="f_icon" placeholder="🌐" maxlength="8">
+          </div>
+          <div class="field">
+            <label>Primary Color</label>
+            <div class="color-row"><input type="color" id="f_color" value="#a855f7"></div>
+          </div>
+          <div class="field">
+            <label>Secondary Color</label>
+            <div class="color-row"><input type="color" id="f_color2" value="#22d3ee"></div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Display Order (lower shows first)</label>
+          <input type="number" id="f_order" placeholder="e.g. 1">
+        </div>
+      </div>
+
+      <div class="section-block">
+        <h3>Service Page Content</h3>
+        <div class="field">
+          <label>Badge (small label above the title)</label>
+          <input type="text" id="f_badge" placeholder="e.g. Web Development">
+        </div>
+        <div class="field">
+          <label>Hero Title (use a new line for the highlighted middle line)</label>
+          <textarea id="f_heroTitle" placeholder="Lightning-Fast&#10;Websites That&#10;Actually Convert" rows="3"></textarea>
+          <div class="hint">The 2nd line gets a gradient highlight, matching the homepage style.</div>
+        </div>
+        <div class="field">
+          <label>Description</label>
+          <textarea id="f_description" placeholder="A few sentences about this service" rows="3"></textarea>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>Starting Price</label>
+            <input type="text" id="f_startingFrom" placeholder="₹6,000">
+          </div>
+          <div class="field">
+            <label>Price Note</label>
+            <input type="text" id="f_priceNote" placeholder="One-time project fee">
+          </div>
+        </div>
+      </div>
+
+      <div class="section-block">
+        <h3>Quick Features (pricing card checklist)</h3>
+        <div id="rep_quickFeatures"></div>
+        <button type="button" class="btn btn-ghost btn-sm rep-add" data-rep="quickFeatures">+ Add Feature</button>
+      </div>
+
+      <div class="section-block">
+        <h3>What's Included (cards on service page)</h3>
+        <div id="rep_included"></div>
+        <button type="button" class="btn btn-ghost btn-sm rep-add" data-rep="included">+ Add Included Item</button>
+      </div>
+
+      <div class="section-block">
+        <h3>Process Steps</h3>
+        <div id="rep_steps"></div>
+        <button type="button" class="btn btn-ghost btn-sm rep-add" data-rep="steps">+ Add Step</button>
+      </div>
+
+      <div class="section-block">
+        <h3>Results Strip</h3>
+        <div id="rep_results"></div>
+        <button type="button" class="btn btn-ghost btn-sm rep-add" data-rep="results">+ Add Result</button>
+      </div>
+
+      <div class="section-block">
+        <h3>FAQs</h3>
+        <div id="rep_faqs"></div>
+        <button type="button" class="btn btn-ghost btn-sm rep-add" data-rep="faqs">+ Add FAQ</button>
+      </div>
+
+      <div class="panel-footer">
+        <button type="button" class="btn btn-ghost" id="cancelFormBtn">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="saveBtn">Save Service</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════
+   AUTH
+══════════════════════════════════════════ */
+const AUTH_KEY = 'golyne_admin_token';
+
+function getAuth(){
+  try{
+    const raw = localStorage.getItem(AUTH_KEY);
+    if(!raw) return null;
+    const parsed = JSON.parse(raw);
+    if(!parsed.token || !parsed.expires || Date.now() > parsed.expires) return null;
+    return parsed;
+  }catch{ return null; }
+}
+function setAuth(token, expires){
+  localStorage.setItem(AUTH_KEY, JSON.stringify({ token, expires }));
+}
+function clearAuth(){
+  localStorage.removeItem(AUTH_KEY);
+}
+function authHeader(){
+  const a = getAuth();
+  return a ? { 'Authorization': 'Bearer ' + a.token } : {};
+}
+
+function showLogin(){
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+}
+function showApp(){
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  loadServices();
+}
+
+document.getElementById('loginForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const btn = document.getElementById('loginBtn');
+  const errBox = document.getElementById('loginError');
+  errBox.style.display = 'none';
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Logging in…';
+  try{
+    const res = await fetch('/api/login', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ password: document.getElementById('loginPassword').value })
+    });
+    const data = await res.json();
+    if(!res.ok){
+      errBox.textContent = data.error || 'Login failed.';
+      errBox.style.display = 'block';
+      return;
+    }
+    setAuth(data.token, data.expires);
+    document.getElementById('loginPassword').value = '';
+    showApp();
+  }catch(err){
+    errBox.textContent = 'Network error. Please try again.';
+    errBox.style.display = 'block';
+  }finally{
+    btn.disabled = false;
+    btn.textContent = 'Log In';
+  }
+});
+
+document.getElementById('logoutBtn').addEventListener('click', ()=>{
+  clearAuth();
+  showLogin();
+});
+
+/* ══════════════════════════════════════════
+   UTIL
+══════════════════════════════════════════ */
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.innerText = str==null ? '' : str;
+  return d.innerHTML;
+}
+function slugify(str){
+  return String(str||'').toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+}
+function flashMessage(id, msg, isError){
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(()=>{ el.style.display='none'; }, 4500);
+}
+function hexToRgba(hex, alpha){
+  hex = (hex||'#a855f7').replace('#','');
+  if(hex.length===3) hex = hex.split('').map(c=>c+c).join('');
+  const r = parseInt(hex.substring(0,2),16)||168, g = parseInt(hex.substring(2,4),16)||85, b = parseInt(hex.substring(4,6),16)||247;
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+/* ══════════════════════════════════════════
+   LOAD + RENDER DASHBOARD
+══════════════════════════════════════════ */
+let currentServices = [];
+
+async function loadServices(){
+  const grid = document.getElementById('servicesGrid');
+  grid.innerHTML = '<div class="empty-state">Loading services…</div>';
+  try{
+    const res = await fetch('/api/services');
+    if(!res.ok) throw new Error('Failed to load');
+    currentServices = await res.json();
+    renderGrid();
+  }catch(err){
+    grid.innerHTML = '<div class="empty-state">Could not load services. Please refresh.</div>';
+  }
+}
+
+function renderGrid(){
+  const grid = document.getElementById('servicesGrid');
+  const sorted = [...currentServices].sort((a,b)=>(a.order||0)-(b.order||0));
+  if(sorted.length===0){
+    grid.innerHTML = '<div class="empty-state">No services yet. Click "+ Add Service" to create your first one.</div>';
+    return;
+  }
+  grid.innerHTML = sorted.map(s=>`
+    <div class="svc-card">
+      <div class="svc-card-top">
+        <div class="svc-emoji" style="background:${hexToRgba(s.color,0.18)};border:1px solid ${hexToRgba(s.color,0.4)};">${escapeHtml(s.icon||'✨')}</div>
+        <div>
+          <div class="svc-name">${escapeHtml(s.name||'Untitled')}</div>
+          <div class="svc-id">${escapeHtml(s.id)}</div>
+        </div>
+      </div>
+      <div class="svc-tagline">${escapeHtml(s.tagline||'')}</div>
+      <div class="svc-meta">
+        <span>Order: ${s.order||0}</span>
+        <span>·</span>
+        <span>${(s.included||[]).length} included items</span>
+        <span>·</span>
+        <span>${(s.faqs||[]).length} FAQs</span>
+      </div>
+      <div class="svc-actions">
+        <button class="btn btn-ghost btn-sm" onclick="openEdit('${s.id}')">Edit</button>
+        <a class="btn btn-ghost btn-sm" href="../service.html?service=${encodeURIComponent(s.id)}" target="_blank">Preview</a>
+        <button class="btn btn-danger btn-sm" onclick="deleteService('${s.id}')">Delete</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ══════════════════════════════════════════
+   REPEATER FIELDS
+══════════════════════════════════════════ */
+const REPEATER_CONFIG = {
+  quickFeatures: { fields: [ {key:'value', placeholder:'e.g. Delivered in 3–5 business days', type:'text'} ] },
+  included: { fields: [ {key:'icon', placeholder:'🎨', type:'text', cls:'rep-icon'}, {key:'title', placeholder:'Title', type:'text'}, {key:'desc', placeholder:'Description', type:'textarea'} ] },
+  steps: { fields: [ {key:'title', placeholder:'Step title', type:'text'}, {key:'desc', placeholder:'Step description', type:'textarea'} ] },
+  results: { fields: [ {key:'num', placeholder:'e.g. 3–5', type:'text'}, {key:'label', placeholder:'e.g. Days to go live', type:'text'} ] },
+  faqs: { fields: [ {key:'q', placeholder:'Question', type:'text'}, {key:'a', placeholder:'Answer', type:'textarea'} ] }
+};
+
+function addRepRow(repName, values){
+  const container = document.getElementById('rep_' + repName);
+  const config = REPEATER_CONFIG[repName];
+  values = values || {};
+  const row = document.createElement('div');
+  row.className = 'rep-row';
+  config.fields.forEach(f=>{
+    let el;
+    if(f.type === 'textarea'){
+      el = document.createElement('textarea');
+      el.rows = 2;
+    } else {
+      el = document.createElement('input');
+      el.type = 'text';
+    }
+    el.placeholder = f.placeholder;
+    el.dataset.key = f.key;
+    if(f.cls) el.className = f.cls;
+    el.value = values[f.key] !== undefined ? values[f.key] : (values.value !== undefined && f.key==='value' ? values.value : '');
+    row.appendChild(el);
+  });
+  const removeBtn = document.createElement('button');
+  removeBtn.type = 'button';
+  removeBtn.className = 'rep-remove';
+  removeBtn.innerHTML = '✕';
+  removeBtn.onclick = ()=> row.remove();
+  row.appendChild(removeBtn);
+  container.appendChild(row);
+}
+
+function clearRepeater(repName){
+  document.getElementById('rep_' + repName).innerHTML = '';
+}
+
+function readRepeater(repName){
+  const container = document.getElementById('rep_' + repName);
+  const config = REPEATER_CONFIG[repName];
+  const rows = Array.from(container.querySelectorAll('.rep-row'));
+  const isSingleField = config.fields.length === 1 && config.fields[0].key === 'value';
+  return rows.map(row=>{
+    const obj = {};
+    config.fields.forEach(f=>{
+      const input = row.querySelector(`[data-key="${f.key}"]`);
+      obj[f.key] = input ? input.value.trim() : '';
+    });
+    return isSingleField ? obj.value : obj;
+  }).filter(item=>{
+    if(typeof item === 'string') return item.length > 0;
+    return Object.values(item).some(v => v && v.length > 0);
+  });
+}
+
+document.querySelectorAll('.rep-add').forEach(btn=>{
+  btn.addEventListener('click', ()=> addRepRow(btn.dataset.rep, {}));
+});
+
+/* ══════════════════════════════════════════
+   ADD / EDIT FORM
+══════════════════════════════════════════ */
+const overlay = document.getElementById('formOverlay');
+
+function openAdd(){
+  document.getElementById('formTitle').textContent = 'Add Service';
+  document.getElementById('f_isEdit').value = '0';
+  document.getElementById('serviceForm').reset();
+  document.getElementById('f_id').value = '';
+  document.getElementById('f_id').disabled = false;
+  document.getElementById('f_color').value = '#a855f7';
+  document.getElementById('f_color2').value = '#22d3ee';
+  ['quickFeatures','included','steps','results','faqs'].forEach(clearRepeater);
+  document.getElementById('formError').style.display = 'none';
+  overlay.style.display = 'block';
+  window.scrollTo(0,0);
+}
+
+function openEdit(id){
+  const s = currentServices.find(x=>x.id===id);
+  if(!s) return;
+  document.getElementById('formTitle').textContent = 'Edit Service';
+  document.getElementById('f_isEdit').value = '1';
+  document.getElementById('f_id').value = s.id;
+  document.getElementById('f_id').disabled = true;
+  document.getElementById('f_name').value = s.name || '';
+  document.getElementById('f_tagline').value = s.tagline || '';
+  document.getElementById('f_icon').value = s.icon || '';
+  document.getElementById('f_color').value = s.color || '#a855f7';
+  document.getElementById('f_color2').value = s.color2 || '#22d3ee';
+  document.getElementById('f_order').value = s.order || '';
+  document.getElementById('f_badge').value = s.badge || '';
+  document.getElementById('f_heroTitle').value = s.heroTitle || '';
+  document.getElementById('f_description').value = s.description || '';
+  document.getElementById('f_startingFrom').value = s.startingFrom || '';
+  document.getElementById('f_priceNote').value = s.priceNote || '';
+
+  clearRepeater('quickFeatures');
+  (s.quickFeatures||[]).forEach(v=>addRepRow('quickFeatures', {value:v}));
+  clearRepeater('included');
+  (s.included||[]).forEach(v=>addRepRow('included', v));
+  clearRepeater('steps');
+  (s.steps||[]).forEach(v=>addRepRow('steps', v));
+  clearRepeater('results');
+  (s.results||[]).forEach(v=>addRepRow('results', v));
+  clearRepeater('faqs');
+  (s.faqs||[]).forEach(v=>addRepRow('faqs', v));
+
+  document.getElementById('formError').style.display = 'none';
+  overlay.style.display = 'block';
+  window.scrollTo(0,0);
+}
+
+function closeForm(){
+  overlay.style.display = 'none';
+}
+
+document.getElementById('addServiceBtn').addEventListener('click', openAdd);
+document.getElementById('closeFormBtn').addEventListener('click', closeForm);
+document.getElementById('cancelFormBtn').addEventListener('click', closeForm);
+overlay.addEventListener('click', (e)=>{ if(e.target === overlay) closeForm(); });
+
+document.getElementById('serviceForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const isEdit = document.getElementById('f_isEdit').value === '1';
+  const errBox = document.getElementById('formError');
+  errBox.style.display = 'none';
+
+  const payload = {
+    id: document.getElementById('f_id').value.trim() || slugify(document.getElementById('f_name').value),
+    name: document.getElementById('f_name').value.trim(),
+    tagline: document.getElementById('f_tagline').value.trim(),
+    icon: document.getElementById('f_icon').value.trim() || '✨',
+    color: document.getElementById('f_color').value,
+    color2: document.getElementById('f_color2').value,
+    order: Number(document.getElementById('f_order').value) || 0,
+    badge: document.getElementById('f_badge').value.trim(),
+    heroTitle: document.getElementById('f_heroTitle').value,
+    description: document.getElementById('f_description').value.trim(),
+    startingFrom: document.getElementById('f_startingFrom').value.trim(),
+    priceNote: document.getElementById('f_priceNote').value.trim(),
+    quickFeatures: readRepeater('quickFeatures'),
+    included: readRepeater('included'),
+    steps: readRepeater('steps'),
+    results: readRepeater('results'),
+    faqs: readRepeater('faqs')
+  };
+
+  if(!payload.name){
+    errBox.textContent = 'Service name is required.';
+    errBox.style.display = 'block';
+    return;
+  }
+
+  const saveBtn = document.getElementById('saveBtn');
+  saveBtn.disabled = true;
+  saveBtn.innerHTML = '<span class="spinner"></span> Saving…';
+
+  try{
+    const res = await fetch('/api/services', {
+      method: isEdit ? 'PUT' : 'POST',
+      headers: { 'Content-Type':'application/json', ...authHeader() },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if(res.status === 401){
+      clearAuth();
+      showLogin();
+      return;
+    }
+    if(!res.ok){
+      errBox.textContent = data.error || 'Could not save the service.';
+      errBox.style.display = 'block';
+      return;
+    }
+    closeForm();
+    await loadServices();
+    flashMessage('dashSuccess', isEdit ? 'Service updated.' : 'Service added.', false);
+  }catch(err){
+    errBox.textContent = 'Network error. Please try again.';
+    errBox.style.display = 'block';
+  }finally{
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Save Service';
+  }
+});
+
+async function deleteService(id){
+  const s = currentServices.find(x=>x.id===id);
+  if(!confirm(`Delete "${s ? s.name : id}"? This cannot be undone.`)) return;
+  try{
+    const res = await fetch('/api/services?id=' + encodeURIComponent(id), {
+      method: 'DELETE',
+      headers: authHeader()
+    });
+    if(res.status === 401){
+      clearAuth();
+      showLogin();
+      return;
+    }
+    if(!res.ok){
+      const data = await res.json().catch(()=>({}));
+      flashMessage('dashError', data.error || 'Could not delete service.', true);
+      return;
+    }
+    await loadServices();
+    flashMessage('dashSuccess', 'Service deleted.', false);
+  }catch(err){
+    flashMessage('dashError', 'Network error. Please try again.', true);
+  }
+}
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+if(getAuth()){
+  showApp();
+}else{
+  showLogin();
+}
+</script>
+</body>
+</html>
