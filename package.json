@@ -1,9 +1,0 @@
-{
-  "name": "golyne-website",
-  "version": "1.0.0",
-  "private": true,
-  "description": "Golyne digital agency website with API-driven services and admin panel",
-  "dependencies": {
-    "@vercel/kv": "^1.0.1"
-  }
-}
